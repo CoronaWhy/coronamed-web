@@ -7,9 +7,6 @@ export default function tableResize(el) {
 	const ths = thead.querySelectorAll('th');
 	const barHeight = nodeName === 'TABLE' ? table.offsetHeight : thead.offsetHeight;
 
-	console.log('thead', thead);
-	console.log('thead', ths);
-
 	const resizeContainer = document.createElement('div');
 	table.style.position = 'relative';
 	resizeContainer.style.position = 'relative';
@@ -21,7 +18,7 @@ export default function tableResize(el) {
 	let movingIndex = 0;
 
 	ths.forEach((th, index) => {
-		th.style.width = th.offsetWidth + 'px';
+		th.style.minWidth = th.style.width = th.offsetWidth + 'px';
 
 		if (index + 1 >= ths.length) return;
 
@@ -46,8 +43,6 @@ export default function tableResize(el) {
 
 	const bars = resizeContainer.querySelectorAll('.columns-resize-bar');
 
-	console.log('bars', bars);
-
 	document.addEventListener('mouseup', () => {
 		if (!moving) return;
 
@@ -58,7 +53,7 @@ export default function tableResize(el) {
 		bars.forEach((bar, index) => {
 			const th = ths[index];
 			const nextTh = ths[index + 1];
-			th.style.width = th.offsetWidth + 'px';
+			th.style.minWidth = th.style.width = th.offsetWidth + 'px';
 			bar.style.left = nextTh.offsetLeft - 4 + 'px';
 		});
 	});
@@ -70,8 +65,8 @@ export default function tableResize(el) {
 			const th = ths[movingIndex];
 			const nextTh = ths[movingIndex + 1];
 			const bar = bars[movingIndex];
-			th.style.width = cutPx(th.style.width) + e.movementX + 'px';
-			nextTh.style.width = cutPx(nextTh.style.width) - e.movementX + 'px';
+			th.style.minWidth = th.style.width = cutPx(th.style.width) + e.movementX + 'px';
+			nextTh.style.minWidth = nextTh.style.width = cutPx(nextTh.style.width) - e.movementX + 'px';
 			bar.style.left = nextTh.offsetLeft - 4 + e.movementX + 'px';
 		}
 	};
