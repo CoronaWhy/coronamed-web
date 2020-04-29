@@ -1,0 +1,33 @@
+/* Panel containter styles */
+@import '~font-awesome/scss/font-awesome.scss';
+
+@import '../bootstrap.scss';
+@import '../header.scss';
+@import '../slide.scss';
+@import '../sidebar.scss';
+@import '../card.scss';
+@import '../buttons.scss';
+@import '../forms.scss';
+@import '../modal.scss';
+@import '../tables.scss';
+
+#panel {
+	height: 100%;
+
+	.mute { color: $gray-500; }
+}
+
+#panel > #content {
+	height: 100%;
+	min-height: 100%;
+	min-width: 320px;
+	padding-top: $header-height;
+	transition: padding 0.4s ease 0s;
+
+	.container-fluid {
+		margin-top: 1.5rem;
+		margin-bottom: 1.5rem;
+		padding-right: 1.5rem;
+		padding-left: 1.5rem;
+	}
+}

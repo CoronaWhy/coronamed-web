@@ -1,0 +1,60 @@
+/* slide fade */
+.slide-fade-enter-active {
+	transition: all .5s ease;
+}
+.slide-fade-leave-active {
+	transform: translate3d(0, 0, 0);
+	opacity: 1;
+}
+.slide-fade-enter, .slide-fade-leave-to {
+	transform: translate3d(0, -5%, 0);
+	opacity: 0;
+}
+
+/* slide left */
+.slide-left-enter-active {
+	transition: all .3s ease;
+}
+.slide-left-leave-active {
+	transition: all .3s ease;
+}
+.slide-left-enter, .slide-left-leave-to {
+	transform: translateX(10px);
+	opacity: 0;
+}
+
+/* slide right */
+.slide-right-enter-active {
+	transition: all .3s ease;
+}
+.slide-right-leave-active {
+	transition: all .3s ease;
+}
+.slide-right-enter, .slide-right-leave-to {
+	transform: translateX(-10px);
+	opacity: 0;
+}
+
+/* slide basic */
+.slide-enter-active {
+	transition: transform 3s, opacity .3s;
+	transform: translateX(-100%); opacity: 0;
+}
+.slide-leave-active {
+	transition: transform 1s, opacity 1.3s;
+	transform: translateX(-50%); opacity: 0;
+}
+.slide-enter-to, .slide-wait {
+	transform: translateX(-50%); opacity: 1;
+}
+.slide-leave-to {
+	transform: translateX(0%); opacity: 0;
+}
+
+.fade-enter-active, .fade-leave-active {
+	transition: opacity .3s
+}
+
+.fade-enter, .fade-leave-to {
+	opacity: 0
+}

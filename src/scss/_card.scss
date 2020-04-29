@@ -1,0 +1,193 @@
+/* basic */
+.card {
+	border: 0px solid #e7e8ec8a;
+	box-shadow: 0px 2px 4px 1px #0000001f;
+	color: #5C5C5C;
+}
+
+.card-title, .card-text {
+	color:#fff;
+}
+
+.card.center {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.card.no-shadow {
+	border: 1px solid $border-color;
+	box-shadow: none;
+}
+
+.card-header .title {
+	font-size: 1rem;
+	color: black;
+	font-weight: 400;
+	margin-top: $card-spacer-y / 2;
+	margin-bottom: $card-spacer-y / 2;
+}
+
+.card.md {
+	@include media-breakpoint-up(md) { max-width: 740px; }
+}
+
+/* list */
+.card-list {
+	flex: 1 1 auto;
+	padding: 0 $card-spacer-x 0 $card-spacer-x;
+	min-height: 80px;
+}
+
+.card-list .label {
+	font-size: .6rem;
+	font-weight: 500;
+	color: #9d9fa2;
+	text-transform: uppercase;
+}
+
+.card-list .small, .card-list small {
+	color: #B5B5B5;
+}
+
+.card-list > .header {
+	@include make-row();
+
+	padding-top: $card-spacer-y * .5;
+	padding-bottom: $card-spacer-y * .5;
+	border-bottom: 1px solid $border-color;
+}
+
+.card-list > .body > .item {
+	@include make-row();
+
+	padding-top: $card-spacer-y;
+	padding-bottom: $card-spacer-y;
+
+	&:not(:last-child) {
+		border-bottom: 1px solid $border-color;
+	}
+}
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+	$infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+	.card-list.mobile#{$infix} {
+		> .header { display: none; }
+		> .body > .item > .column:not(:first-child):not(:last-child) {
+			padding-top: $card-spacer-y * .5;
+			padding-bottom: $card-spacer-y * .5;
+		}
+
+		@include media-breakpoint-up($breakpoint) {
+			> .header { display: flex; }
+			> .body > .item > .column {
+				&:not(:first-child):not(:last-child) {
+					padding-top: 0;
+					padding-bottom: 0;
+				}
+
+				> .header { display: none; }
+			}
+		}
+	}
+}
+
+/* tabs */
+.card-header > ul.tabs {
+	padding: 0;
+	margin-right: -($card-spacer-x / 2);
+	margin-bottom: -$card-spacer-y;
+	margin-left: -($card-spacer-x / 2);
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+
+	&.right {
+		float: right;
+	}
+
+	&.center {
+		> li.item {
+			margin-left: auto;
+			margin-right: auto;
+		}
+	}
+
+	> li.item {
+		padding: 0 $card-spacer-x $card-spacer-y;
+		cursor: pointer;
+		font-size: .9rem;
+		line-height: 2.1rem;
+
+		> i {
+			font-size: 2.1rem;
+			vertical-align: middle;
+		}
+
+		&:hover, &:focus, &.active {
+			border-bottom: 2px solid lighten($blue, 5%);
+			margin-bottom: -2px;
+		}
+
+		&.success {
+			&:hover, &:focus, &.active {
+				border-bottom: 2px solid darken($green, 5%);
+			}
+		}
+	}
+}
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+	$infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+	.card-header > ul.tabs.mobile#{$infix}-icon > li.item {
+		> i { display: block; }
+		> span { display: none; }
+
+		@include media-breakpoint-up($breakpoint) {
+			> i { display: none; }
+			> span { display: block; }
+		}
+	}
+
+	.card-header > ul.tabs.mobile#{$infix}-title > li.item {
+		> i { margin-right: .0; }
+		> span { display: none; }
+
+		@include media-breakpoint-up($breakpoint) {
+			> i { margin-right: 1rem; }
+			> span { display: initial; }
+		}
+	}
+}
+
+/* outline */
+.card.outline {
+	background-color: transparent;
+	box-shadow: none;
+	color: $white;
+
+	.card-header {
+		background-color: transparent;
+		border-bottom: 2px solid $gray-700;
+		color: $white;
+	}
+
+	.card-body {
+		border: none;
+
+		.form-control {
+			background-color: transparent;
+			color: $white;
+		}
+	}
+
+	.card-footer {
+		background-color: transparent;
+		border-top: 2px solid $gray-700;
+	}
+
+	.form-st > .section {
+		border-color: $gray-700;
+	}
+}

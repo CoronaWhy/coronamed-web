@@ -1,0 +1,59 @@
+@each $color, $value in $theme-colors {
+	.btn-#{$color} {
+		&:not([disabled]):not(.disabled) {
+			color: white;
+
+			&:focus,
+			&.focus {
+				color: white;
+			}
+		}
+	}
+}
+
+.btn-link {
+	box-shadow: none !important;
+	border: 0;
+	cursor: pointer;
+	background-color: initial;
+	padding: 0;
+	maring: 0;
+}
+
+.btn-default {
+	border-color: $border-color;
+	color: darken($body-color, 4%);
+	background-color: #fff;
+}
+
+.btn-default:hover, .btn-default:focus, .btn-default:active, .btn-default.active, .open .dropdown-toggle.btn-default {
+	background-color: #fff;
+	border-color: darken($border-color, 15%);
+	color: darken($body-color, 4%);
+}
+
+// /* outline */
+@each $color, $value in $theme-colors {
+	.btn-outline-#{$color} {
+		&:not([disabled]):not(.disabled),
+		.show > &.dropdown-toggle {
+			&:hover { color: white !important; }
+			&:active, &.active { color: white !important; }
+		}
+	}
+}
+
+.btn-outline-default {
+	border-color: $gray-600;
+	box-shadow: none !important;
+	background-color: transparent;
+	color: $gray-600;
+
+	&:hover,
+	&:active,
+	&.active,
+	.show > &.dropdown-toggle {
+		border-color: darken($border-color, 15%);
+		color: $white;
+	}
+}

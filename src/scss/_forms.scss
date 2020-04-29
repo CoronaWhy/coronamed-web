@@ -1,0 +1,90 @@
+.form-control {
+	&::placeholder {
+		font-weight: 400;
+	}
+}
+
+.card-body .form-st {
+	margin-left: -5px;
+	margin-right: -5px;
+}
+
+.form-st > .section {
+	@include make-row();
+
+	&:not(:first-child) {
+		padding-top: $form-group-margin-bottom;
+	}
+
+	&:not(:last-child) {
+		border-bottom: 2px solid lighten($gray, 13%);
+		padding-bottom: $form-group-margin-bottom;
+	}
+
+	> .title {
+		@include make-col-ready();
+		font-weight: 500;
+
+		h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+			margin-bottom: 0;
+		}
+	}
+
+	> .label {
+		@include make-col-ready();
+
+		> span { color: darken($gray, 25%); line-height: 1.5rem; }
+
+		@each $breakpoint, $size in $grid-breakpoints {
+			&.#{$breakpoint} { max-width: $size - 518px !important; }
+		}
+	}
+
+	> .input {
+		@include make-col-ready();
+
+		> .form-control {
+			border: none;
+			padding: 0;
+		}
+
+		> select.form-control-lg {
+			height: 1.5rem;
+		}
+	}
+
+	> .feedback {
+		@include make-col-ready();
+
+		background-color: $gray-600;
+		color: white;
+		padding: 10px 25px;
+		margin-top: $form-group-margin-bottom;
+		margin-bottom: -$form-group-margin-bottom;
+
+		&:after {
+			position: absolute;
+			content: '▲';
+			top: -10px;
+			left: 55px;
+			color: $gray-600;
+		}
+
+		@each $theme-name, $color in $theme-colors {
+			&.#{$theme-name} {
+				background-color: $color;
+				&:after { color: $color; }
+			}
+		}
+	}
+
+	@each $breakpoint in map-keys($grid-breakpoints) {
+		@include media-breakpoint-up($breakpoint) {
+			&.#{$breakpoint} {
+				> .label { @include make-col(12); flex-grow: 1; flex-basis: 0; }
+				> .label.hidden { display: none; }
+				> .input { @include make-col(12); flex-grow: 1; flex-basis: 0; }
+			}
+		}
+	}
+}

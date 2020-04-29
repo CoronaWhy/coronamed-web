@@ -1,0 +1,42 @@
+.app-header {
+	z-index: 300;
+	display: block;
+	position: fixed;
+	top: 0;
+	left: 0;
+	min-width: 100%;
+	min-height: $header-height;
+	transition: margin 0.4s;
+	background-color: $header-bg;
+	border-bottom: 1px solid darken($header-bg, 25);
+
+	&__container {
+		padding: 5px 15px;
+		color: $header-color;
+	}
+
+	&__profile {
+		display: inline-block;
+
+		.title {
+			font-size: 13px;
+			display: inline-block;
+		}
+
+		.avatar {
+			width: 32px;
+			height: 32px;
+			border-radius: 50%;
+			display: inline;
+			margin-left: 15px;
+		}
+
+		@include media-breakpoint-down(xs) {
+			.avatar { display: none; }
+		}
+	}
+
+	&__logo {
+		height: 43px;
+	}
+}

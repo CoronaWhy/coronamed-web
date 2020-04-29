@@ -1,0 +1,124 @@
+.app-sidebar {
+	width: $sidebar-left-width;
+	height: 100%;
+	float: left;
+	background-color: $sidebar-bg;
+	transition: transform 0.4s;
+	color: $gray-600;
+	z-index: 100;
+	padding-top: $header-height;
+	box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.2);
+
+	&__body {
+		min-height: 100%;
+		padding-bottom: $sidebar-footer-h;
+		margin-bottom: -$sidebar-footer-h;
+	}
+
+	&__footer {
+		width: 100%;
+		padding: 10px 18px;
+		height: $sidebar-footer-h;
+		color: #6F6F6F;
+		font-weight: 400;
+		font-size: .66rem;
+
+		.notice {
+			color: #8B8B8B;
+		}
+
+		.lang {
+			cursor: pointer;
+		}
+	}
+}
+
+.app-sidebar--left {
+	width: $sidebar-left-width;
+	transform: translateX(-101%);
+	position: fixed;
+	top: 0;
+	left: 0;
+	border-right: 1px solid #ECE9FA;
+
+	&--show & { transform: translateX(0%); }
+}
+
+.app-sidebar--right {
+	width: $sidebar-right-width;
+	transform: translateX(101%);
+	position: fixed;
+	top: 0;
+	right: 0;
+	border-left: 1px solid #ECE9FA;
+
+	&--show & { transform: translateX(0%); }
+}
+
+.app-sidebar ul.nav.app-sidebar__nav {
+	padding-top: 10px;
+	padding-left: 0;
+	margin-bottom: 0;
+	list-style: none;
+
+	li {
+		width: 100%;
+		display: block;
+
+		a {
+			cursor: pointer;
+			text-decoration: none;
+		}
+
+		a, span {
+			display: block;
+			width: 100%;
+			position: relative;
+			padding: 10px 45px;
+			white-space: nowrap;
+			overflow: hidden;
+			color: #595959;
+		}
+
+		a:hover, a:focus {
+			color: $sidebar-hover;
+		}
+
+		a.active, a.open {
+			color: $sidebar-active;
+		}
+
+		span {
+			text-transform: none;
+			font-weight: 400;
+			font-size: .8rem;
+			text-overflow: ellipsis;
+		}
+	}
+}
+
+
+/* full-width sidebar for mobile */
+@include media-breakpoint-down(sm) {
+	.app-sidebar--left { width: 100%; z-index: 200; }
+	.app-sidebar--right { width: 100%; z-index: 200; }
+
+	// .app-sidebar--left--show #content, .app-sidebar--right--show #content {
+	// 	overflow: hidden;
+	// }
+}
+
+/* margin content when high screen size */
+@include media-breakpoint-up(lg) {
+	.app-sidebar--left--show #content { padding-left: $sidebar-left-width; }
+	.app-sidebar--left {
+		box-shadow: none;
+	}
+}
+
+@include media-breakpoint-up(md) {
+	.app-sidebar--right--show #content { padding-right: $sidebar-right-width; }
+	.app-sidebar--right {
+		box-shadow: none;
+	}
+}
