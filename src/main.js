@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import VueAxios from 'vue-axios';
 import VueMaterial from 'vue-material';
-import VueColumnsResizable from 'vue-columns-resizable';
 
 import VueSweetAlert from '@/lib/swal';
 import VeeValidate from '@/lib/validator';
@@ -19,7 +18,6 @@ import store from './store';
 Vue.config.productionTip = false;
 
 Vue.use(VueMaterial);
-Vue.use(VueColumnsResizable);
 Vue.use(VeeValidate, { locale: 'en', events: 'input' });
 Vue.use(VueSweetAlert, { heightAuto: false });
 Vue.use(VueAxios, axios);
