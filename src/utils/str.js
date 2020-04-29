@@ -10,6 +10,20 @@ export function escapeRegExp(str) {
 	return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'); // eslint-disable-line
 }
 
+export function parseNumber(v) {
+	v = String(v)
+		.replace(/,/g, '.')
+		.trim();
+
+	const result = parseFloat(v);
+
+	if (isNaN(result) || !isFinite(result)) {
+		return null;
+	}
+
+	return result;
+}
+
 /**
  * A util function for assign string with object
  * @param  {String} str Source pattern string

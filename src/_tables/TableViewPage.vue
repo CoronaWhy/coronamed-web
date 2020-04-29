@@ -6,7 +6,7 @@
 		md-table(
 			v-model="displayList",
 			:md-sort.sync="currentSort",
-			:md-sort-order.sync="currentSortOrder",
+			:md-sort-order.sync="currentSortOrder"
 			md-card
 		)
 			// Card header
@@ -51,11 +51,13 @@
 
 <script>
 import _get from 'lodash/get';
+import _sortBy from 'lodash/sortBy';
+
 import { mapGetters } from 'vuex';
 import { loadData } from '@/lib/data';
 import tableResize from '@/lib/table-resize';
 
-import { isLink } from '@/utils/str';
+import { isLink, parseNumber } from '@/utils/str';
 import { frendlyString } from './utils';
 
 export default {
@@ -109,7 +111,14 @@ export default {
 					const obj = {};
 
 					header.forEach((key, index) => {
-						obj[key] = set[index];
+						const rawValue = set[index];
+						const numValue = parseNumber(rawValue);
+
+						if (numValue !== null) {
+							obj[key] = numValue;
+						} else {
+							obj[key] = set[index];
+						}
 					});
 
 					return obj;
@@ -134,6 +143,15 @@ export default {
 	},
 	methods: {
 		isLink,
+		customSort(value) {
+			const list = _sortBy(value, this.currentSort);
+
+			if (this.currentSortOrder === 'desc') {
+				return list.reverse();
+			}
+
+			return list;
+		},
 		initResize() {
 			const thead = this.$el.querySelector('thead');
 			tableResize(thead);
