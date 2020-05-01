@@ -23,8 +23,9 @@
 			// Card content
 			md-table-row(slot="md-table-row", slot-scope="{ item, index }")
 				md-table-cell(
-					v-for="(value, key) in item"
-					:key="key + index"
+					v-for="(value, key) in item",
+					:style="columnStyle[key.toLowerCase()]",
+					:key="key + index",
 					:md-label="key",
 					:md-sort-by="key",
 				)
@@ -72,6 +73,10 @@ export default {
 		searchTerm: '',
 		currentSort: 'ID',
 		currentSortOrder: 'asc',
+		columnStyle: {
+			'id': 'min-width: 100px',
+			'date': 'min-width: 110px'
+		}
 	}),
 	computed: {
 		...mapGetters(['isPageLoading']),
@@ -105,7 +110,8 @@ export default {
 				return headerName;
 			});
 
-			return list
+			const maxTextLen = {};
+			const result = list
 				.filter(set => set.length - header.length >= 0)
 				.map(set => {
 					const obj = {};
@@ -119,10 +125,17 @@ export default {
 						} else {
 							obj[key] = set[index];
 						}
+
+						maxTextLen[key] = Math.max(
+							String(obj[key]).length,
+							maxTextLen[key] || 0
+						);
 					});
 
 					return obj;
 				});
+
+				return { maxTextLen, list: result };
 		}
 	},
 	watch: {
@@ -131,7 +144,10 @@ export default {
 			immediate: true
 		},
 		'parsedDataSet': {
-			handler: 'computeDisplayList',
+			handler() {
+				this.computeColumnStyles();
+				this.computeDisplayList();
+			},
 			immediate: true
 		},
 		pageTitle: {
@@ -155,6 +171,11 @@ export default {
 		initResize() {
 			const thead = this.$el.querySelector('thead');
 			tableResize(thead);
+
+			// flush column styles to give ability change size
+			this.$nextTick(() => {
+				this.columnStyle = {};
+			});
 		},
 		fetchData() {
 			const loader = loadData(`tables/${this.filePath}`);
@@ -174,8 +195,24 @@ export default {
 				this.$store.dispatch('pageLoader', false);
 			});
 		},
+		computeColumnStyles() {
+			const result = {};
+
+			Object.keys(this.parsedDataSet.maxTextLen).forEach(key => {
+				const maxTextSize = this.parsedDataSet.maxTextLen[key];
+				let minWidth = Math.min(maxTextSize * 5, 540);
+
+				minWidth = Math.max(minWidth, 100);
+
+				result[key.toLowerCase()] = {
+					'min-width': Math.floor(minWidth) + 'px'
+				};
+			});
+
+			this.columnStyle = result;
+		},
 		computeDisplayList() {
-			this.displayList = this.parsedDataSet.filter(v => {
+			this.displayList = this.parsedDataSet.list.filter(v => {
 				const searchbleText = Object.keys(v)
 				.map(key => String(v[key]).toLowerCase())
 				.join(' ');
