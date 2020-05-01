@@ -29,10 +29,7 @@
 					:md-label="key",
 					:md-sort-by="key",
 				)
-					template(v-if="isLink(value)")
-						a(:href="value", target="_blank") link
-					template(v-else)
-						span {{ value }}
+					span(v-html="value")
 
 			// Card footer
 			template(v-slot:md-table-pagination)
@@ -120,14 +117,20 @@ export default {
 						const rawValue = set[index];
 						const numValue = parseNumber(rawValue);
 
-						if (numValue !== null) {
-							obj[key] = numValue;
-						} else {
-							obj[key] = set[index];
+						let value = rawValue;
+						let textLen = String(rawValue).length;
+
+						if (numValue !== null && rawValue.indexOf('-') < 0) {
+							value = numValue;
+						} else if (isLink(rawValue)) {
+							textLen = 4;
+							value = `<a href="${value}" target="_blank">link</a>`;
 						}
 
+						obj[key] = value;
+
 						maxTextLen[key] = Math.max(
-							String(obj[key]).length,
+							textLen,
 							maxTextLen[key] || 0
 						);
 					});
@@ -158,7 +161,6 @@ export default {
 		}
 	},
 	methods: {
-		isLink,
 		customSort(value) {
 			const list = _sortBy(value, this.currentSort);
 
@@ -200,9 +202,7 @@ export default {
 
 			Object.keys(this.parsedDataSet.maxTextLen).forEach(key => {
 				const maxTextSize = this.parsedDataSet.maxTextLen[key];
-				let minWidth = Math.min(maxTextSize * 5, 540);
-
-				minWidth = Math.max(minWidth, 100);
+				let minWidth = 100 + Math.min(maxTextSize * 4, 540);
 
 				result[key.toLowerCase()] = {
 					'min-width': Math.floor(minWidth) + 'px'
