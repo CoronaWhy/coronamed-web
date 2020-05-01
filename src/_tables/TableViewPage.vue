@@ -30,7 +30,7 @@
 					:md-sort-by="key",
 				)
 					template(v-if="isLink(value)")
-						a(:href="value", target="_blank") {{ value }}
+						a(:href="value", target="_blank") link
 					template(v-else)
 						span {{ value }}
 
