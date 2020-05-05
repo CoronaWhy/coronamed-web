@@ -14,7 +14,7 @@
 				// Card header
 				md-table-toolbar.md-card-toolbar
 					.md-toolbar-section-start
-						.md-title Questions
+						.md-title Questions ({{displayList.length}} questions)
 
 					md-field.md-toolbar-section-end(md-clearable)
 						md-input(placeholder="Search by title..." v-model="searchTerm", @input="computeDisplayList")

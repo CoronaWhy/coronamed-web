@@ -5,6 +5,8 @@
 				.col-auto.align-self-start.align-self-center
 					.sandwich-button(@click="toogleSidebar")
 						i.fa.fa-bars
+				.col-auto.align-self-end.align-self-center
+					img(src="/img/logo.png")
 
 		slide-loader(:display="isPageLoading")
 </template>
