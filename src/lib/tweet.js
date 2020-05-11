@@ -27,7 +27,7 @@ const processTweetCounts = (tweetCounts, doiIds) => {
 const patchWithTweetsNumbers = (result, tweetCountsByIndex) => {
 	return result.map((row, index) => ([
 		row[0],
-		index === 0 ? '# of tweets' : (tweetCountsByIndex[index] || '-'),
+		index === 0 ? '# of Tweets' : (tweetCountsByIndex[index] || '-'),
 		...row.slice(1)
 	]));
 };
