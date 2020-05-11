@@ -54,6 +54,7 @@ import _sortBy from 'lodash/sortBy';
 import { mapGetters } from 'vuex';
 import { loadData } from '@/lib/data';
 import tableResize from '@/lib/table-resize';
+import { fetchTweetCounts } from '@/lib/tweet';
 
 import { isLink, parseNumber } from '@/utils/str';
 import { frendlyString } from './utils';
@@ -186,8 +187,10 @@ export default {
 			this.dataSet = [];
 			this.displayError = null;
 
-			loader().then(result => {
-				this.dataSet = result.default;
+			loader()
+			.then((result) => fetchTweetCounts(result.default))
+			.then((result) => {
+				this.dataSet = result;
 				this.$nextTick(() => {
 					this.initResize();
 				});
