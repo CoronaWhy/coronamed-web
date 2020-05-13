@@ -1,12 +1,21 @@
 <template lang="pug">
-	.tables-view-page
-		slide-loader(:display="isPageLoading")
+	.tables-view-page(
+		v-shortkey="{ 1: ['ctrl', 'v'], 2: ['meta', 'v'] }",
+		@shortkey="pasteAction()"
+	)
+		h6.page-title.mb-4
+			b(v-if="displayCategory") {{ displayCategory }} -&nbsp;
+			span {{ displayName }}
 
 		// Display table case
+		slide-loader(:display="isPageLoading")
+
 		md-table(
+			v-if="!isPageLoading",
 			v-model="displayList",
 			:md-sort.sync="currentSort",
-			:md-sort-order.sync="currentSortOrder"
+			:md-sort-order.sync="currentSortOrder",
+			:md-sort-fn="customSort"
 			md-card
 		)
 			// Card header
@@ -14,8 +23,6 @@
 				.md-toolbar-section-start
 					.line.mt-2
 						router-link.btn(:to="{ name: 'tables' }") Show List
-						.md-title.mr-4(style="font-size: 12px;")
-							.text-break {{ frendlyFileName }}
 
 				md-field.md-toolbar-section-end(md-clearable, v-if="!displayError")
 					md-input(placeholder="Search" v-model="searchTerm", @input="computeDisplayList")
@@ -52,12 +59,10 @@ import _get from 'lodash/get';
 import _sortBy from 'lodash/sortBy';
 
 import { mapGetters } from 'vuex';
-import { loadData } from '@/lib/data';
 import tableResize from '@/lib/table-resize';
 import { fetchTweetCounts } from '@/lib/tweet';
 
 import { isLink, parseNumber } from '@/utils/str';
-import { frendlyString } from './utils';
 
 export default {
 	name: 'TableViewPage',
@@ -66,6 +71,7 @@ export default {
 	mixins: [],
 	data: () => ({
 		displayError: null,
+		sheet: null,
 		displayList: [],
 		dataSet: [],
 		searchTerm: '',
@@ -78,27 +84,37 @@ export default {
 	}),
 	computed: {
 		...mapGetters(['isPageLoading']),
-		baseTitle() {
-			return [process.env.VUE_APP_TITLE, _get(this.$route, 'meta.title')]
-				.filter(v => v && v.length)
-				.join(' - ');
-		},
 		pageTitle() {
-			return [this.baseTitle, this.frendlyFileName]
-				.filter(v => v && v.length)
-				.join(' / ');
+			return this.displayTitle;
 		},
-		filePath() {
+		displayName() {
+			return _get(this.sheet, 'name', null);
+		},
+		displayCategory() {
+			return _get(this.sheet, 'category', null);
+		},
+		displayTitle() {
+			const title = _get(this.sheet, 'title', null);
+
+			switch (true) {
+				case title && title.length > 0:
+					return title;
+
+				case this.isPageLoading:
+					return 'Loading...';
+
+				default:
+					return 'Unknown';
+			}
+		},
+		sheetId() {
 			return this.$route.params.id;
-		},
-		frendlyFileName() {
-			return frendlyString(this.filePath || '');
 		},
 		parsedDataSet() {
 			let cellCur = 0;
 
-			const list = this.dataSet.slice(1);
-			const header = (this.dataSet[0] || []).map((headerName, index) => {
+			const rows = _get(this.sheet, 'rows', []);
+			const header = _get(this.sheet, 'header', []).map((headerName, index) => {
 				if (!headerName && index === 0) {
 					return 'ID';
 				} else if (!headerName) {
@@ -109,19 +125,19 @@ export default {
 			});
 
 			const maxTextLen = {};
-			const result = list
-				.filter(set => set.length - header.length >= 0)
-				.map(set => {
+			const result = rows
+				// .filter(set => set.length - header.length >= 0)
+				.map(row => {
 					const obj = {};
 
 					header.forEach((key, index) => {
-						const rawValue = set[index];
+						const rawValue = _get(row, ['cells', index, 'v']);
 						const numValue = parseNumber(rawValue);
 
 						let value = rawValue;
 						let textLen = String(rawValue).length;
 
-						if (numValue !== null && rawValue.indexOf('-') < 0) {
+						if (numValue !== null && String(rawValue).indexOf('-') < 0) {
 							value = numValue;
 						} else if (isLink(rawValue)) {
 							textLen = 4;
@@ -139,11 +155,11 @@ export default {
 					return obj;
 				});
 
-				return { maxTextLen, list: result };
+			return { maxTextLen, list: result };
 		}
 	},
 	watch: {
-		'id': {
+		'sheetId': {
 			handler: 'fetchData',
 			immediate: true
 		},
@@ -153,15 +169,46 @@ export default {
 				this.computeDisplayList();
 			},
 			immediate: true
-		},
-		pageTitle: {
-			handler(newValue) {
-				document.title = newValue;
-			},
-			immediate: true
 		}
 	},
 	methods: {
+		async pasteAction() {
+			try {
+				const text = await navigator.clipboard.readText();
+
+				if (!text || !text.length) {
+					return;
+				}
+
+				const rows = text
+					.split('\n')
+					.map(v => v.trim().split('\t'));
+
+				const maxCells = Math.max(...rows.map(v => v.length));
+
+				if (!rows || !maxCells) {
+					return;
+				}
+
+				this.$swal.dialog({
+					title: `Adding ${rows.length} rows with ${maxCells} columns into table?`,
+					preConfirm: () => {
+						const apiUrl = `v1/sheets/${this.sheetId}/rows/plain`;
+
+						return this.$http.patch(apiUrl, { text });
+					}
+				}).then(() => {
+					this.fetchData();
+					this.$swal.success('Success', `Successfully added`);
+				}).catch(err => {
+					if (err === 'cancel') return;
+					this.$swal.showError('Failed', err);
+					this.$store.dispatch('pageLoader', false);
+				});
+			} catch (err) {
+				this.$swal.warn('Sorry, we cannot access to clipboard data, maybe you are using old browser.');
+			}
+		},
 		customSort(value) {
 			const list = _sortBy(value, this.currentSort);
 
@@ -181,24 +228,25 @@ export default {
 			});
 		},
 		fetchData() {
-			const loader = loadData(`tables/${this.filePath}`);
+			const apiUrl = `v1/sheets/${this.sheetId}`;
 
 			this.$store.dispatch('pageLoader', true);
+			this.sheet = null;
 			this.dataSet = [];
 			this.displayError = null;
 
-			loader()
-			.then((result) => fetchTweetCounts(result.default))
-			.then((result) => {
-				this.dataSet = result;
-				this.$nextTick(() => {
-					this.initResize();
+			return this.$http.get(apiUrl)
+				.then(result => {
+					this.$store.dispatch('pageLoader', false);
+					this.sheet = result;
+
+					setTimeout(() => this.initResize(), 400);
+				})
+				.then(() => fetchTweetCounts(this.parsedDataSet))
+				.catch(err => {
+					this.$store.dispatch('pageLoader', false);
+					this.displayError = err.message;
 				});
-			}).catch(err => {
-				this.displayError = err.message;
-			}).then(() => {
-				this.$store.dispatch('pageLoader', false);
-			});
 		},
 		computeColumnStyles() {
 			const result = {};

@@ -18,6 +18,7 @@ import '@/scss/containers/panel.scss';
 import { mapGetters } from 'vuex';
 import BootstrapVue from 'bootstrap-vue';
 import Vue from 'vue';
+import _get from 'lodash/get';
 
 import AppHeader from '@/components/AppHeader.vue';
 import AppLeftSidebar from '@/components/AppLeftSidebar.vue';
@@ -83,12 +84,38 @@ export default {
 		},
 		hideSidebar(side = 'left') {
 			this.isSidebarShow[side] = false;
+		},
+		updatePageTitle(newTitle) {
+			console.debug('[page-title] set = ', newTitle);
+
+			const metaTitle = _get(this.$route, 'meta.title');
+
+			let baseTitle = process.env.VUE_APP_TITLE;
+			let subTitle = metaTitle;
+
+			if (newTitle) {
+				subTitle = newTitle;
+			}
+
+			document.title = [baseTitle, subTitle]
+				.filter(v => v && v.length)
+				.join(' - ');
 		}
+	},
+	beforeDestroy() {
+		this.destroyRefreshRecentQuestionCount();
+
+		this.$root.$off('sidebar:toggle', this.toggleSidebar);
+		this.$root.$off('sidebar:show', this.showSidebar);
+		this.$root.$off('sidebar:hide', this.hideSidebar);
+
+		this.$root.$on('page-title:set', this.updatePageTitle);
 	},
 	created() {
 		this.$root.$on('sidebar:toggle', this.toggleSidebar);
 		this.$root.$on('sidebar:show', this.showSidebar);
 		this.$root.$on('sidebar:hide', this.hideSidebar);
+		this.$root.$on('page-title:set', this.updatePageTitle);
 	}
 };
 </script>

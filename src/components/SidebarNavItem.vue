@@ -15,7 +15,9 @@
 <script>
 export default {
 	name: 'SidebarNavItem',
-	props: ['item'],
+	props: {
+		item: { type: Object, default: null }
+	},
 	data: () => ({
 		isOpen: false
 	}),

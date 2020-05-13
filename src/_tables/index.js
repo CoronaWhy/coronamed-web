@@ -8,8 +8,7 @@ export const routes = [{
 	children: [{
 		path: ':id',
 		name: 'tables.view',
-		component: () => import(/* webpackChunkName: "table-view" */ './TableViewPage.vue'),
-		meta: { title: 'Table' }
+		component: () => import(/* webpackChunkName: "table-view" */ './TableViewPage.vue')
 	}]
 }, {
 	path: '/interactive-tables',
