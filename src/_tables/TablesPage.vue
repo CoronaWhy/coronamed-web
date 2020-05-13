@@ -80,7 +80,7 @@ export default {
 	},
 	methods: {
 		refresh() {
-			if (!this.showList) return;
+			console.log('refresh sheets list');
 
 			const apiUrl = 'v1/sheets';
 
