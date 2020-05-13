@@ -14,7 +14,7 @@ const http = axios.create({
 });
 
 http.interceptors.request.use(function(config) {
-	const token = store.state.user.token;
+	const token = _get(store, 'state.user.token');
 
 	if (typeof token === 'string') {
 		config.headers.Authorization = `JWT ${token}`;
