@@ -44,6 +44,8 @@ http.interceptors.response.use(function(response) {
 
 	return data;
 }, function(err) {
+	console.warn('[axios] error:', err);
+
 	const payload = err.response.data;
 	const apiErr = errorParser(payload);
 
