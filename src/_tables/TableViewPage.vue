@@ -244,6 +244,8 @@ export default {
 				})
 				.then(() => fetchTweetCounts(this.parsedDataSet))
 				.catch(err => {
+					console.warn('failed to fetch sheet:', err);
+
 					this.$store.dispatch('pageLoader', false);
 					this.displayError = err.message;
 				});
