@@ -180,9 +180,18 @@ export default {
 					return;
 				}
 
-				const rows = text
-					.split('\n')
-					.map(v => v.trim().split('\t'));
+				const rows = text.replace(/"((?:[^"]*(?:\r\n|\n\r|\n|\r))+[^"]+)"/mg, function (match, p1) {
+					// This function runs for each cell with multi lined text.
+					return p1
+						// Replace any double double-quotes with a single
+						// double-quote
+						.replace(/""/g, '"')
+						// Replace all new lines with spaces.
+						.replace(/\r\n|\n\r|\n|\r/g, ' ')
+					;
+				})
+				// Split each line into rows
+				.split(/\r\n|\n\r|\n|\r/g);
 
 				const maxCells = Math.max(...rows.map(v => v.length));
 
@@ -195,7 +204,7 @@ export default {
 					preConfirm: () => {
 						const apiUrl = `v1/sheets/${this.sheetId}/rows/plain`;
 
-						return this.$http.patch(apiUrl, { text });
+						return this.$http.patch(apiUrl, { text: rows.join('\n') });
 					}
 				}).then(() => {
 					this.fetchData();
