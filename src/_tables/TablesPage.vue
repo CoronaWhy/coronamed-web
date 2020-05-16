@@ -4,12 +4,12 @@
 		router-view
 
 		// Display table case
-		template(v-if="showList ")
+		template(v-if="showList")
 			md-card
 				// Card header
 				md-toolbar(md-elevation="0").md-card-toolbar.md-toolbar.md-table-toolbar.md-transparent.md-card-toolbar.md-theme-default.md-elevation-0
 					.md-toolbar-section-start
-						.md-title Questions ({{ displayList.length }} questions)
+						.md-title Key Scientific Questions about COVID-19 <small>({{ displayList.length }} questions)</small>
 
 					md-field.md-toolbar-section-end(md-clearable)
 						md-input(placeholder="Search by title..." v-model="filter.q")
@@ -30,11 +30,10 @@
 						@click="onSelect(item)"
 					)
 						md-table-cell(md-label="File Name",  md-sort-by="title")
-							template(v-if="item.category")
-								span {{ item.category }}&nbsp;
-								b {{ item.name }}
-							template(v-else)
-								span {{ item.title }}
+							span {{ item.name }}
+
+						md-table-cell(md-label="Records",  md-sort-by="recordsAmount")
+							span {{ item.recordsAmount }}
 
 					// Card footer
 					template(v-slot:md-table-pagination)

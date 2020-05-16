@@ -19,7 +19,8 @@ const api = {
 			heightAuto: false,
 			showCancelButton: true,
 			confirmButtonText: opts.confirm || 'Yes, I\'m Sure',
-			preConfirm: opts.preConfirm
+			preConfirm: opts.preConfirm,
+			width: opts.width
 		});
 
 		return new Promise((resolve, reject) => {

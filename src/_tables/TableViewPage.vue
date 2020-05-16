@@ -22,19 +22,20 @@
 			md-table-toolbar.md-card-toolbar
 				.md-toolbar-section-start
 					.line.mt-2
-						router-link.btn(:to="{ name: 'tables' }") Show List
+						router-link.btn(:to="{ name: 'tables' }") SHOW LIST
+						a.btn(:href="exportUrl", target="_blank") EXPORT (CSV)
 
-				md-field.md-toolbar-section-end(md-clearable, v-if="!displayError")
+				md-field.md-toolbar-section-end(md-clearable)
 					md-input(placeholder="Search" v-model="searchTerm", @input="computeDisplayList")
 
 			// Card content
 			md-table-row(slot="md-table-row", slot-scope="{ item, index }")
 				md-table-cell(
-					v-for="(value, key) in item",
-					:style="columnStyle[key.toLowerCase()]",
-					:key="key + index",
-					:md-label="key",
-					:md-sort-by="key",
+					v-for="(value, cellIndex) in item.cells",
+					:style="columnStyle[cellIndex]",
+					:key="index + ':' + cellIndex",
+					:md-label="parsedDataSet.header[cellIndex]",
+					:md-sort-by="String(cellIndex)",
 				)
 					span(v-html="value")
 
@@ -52,6 +53,38 @@
 			template(v-slot:md-table-pagination)
 				md-card-content
 					.line Records: {{ displayList.length }}
+
+		// Display paste dialog
+		md-dialog(
+			:md-active.sync="showPasteDialog",
+			:md-click-outside-to-close="!isPageLoading",
+			:md-close-on-esc="!isPageLoading",
+			:md-fullscreen="true"
+		)
+			md-dialog-title Paste {{ pasteDataSet.length -1 }} rows into table?
+
+			md-dialog-content(v-if="pasteDataSetNative")
+				md-field
+					label Paste copied table
+					md-textarea(@input="onPasteDataSetNativeInput")
+
+			md-dialog-content(v-if="pasteDataSet.length < 2")
+				.text-danger Your data-set has less than two rows, make sure that you copied the headers too.
+			md-dialog-content(v-else)
+				table.table__log.full-width
+					tr
+						th(v-for="header in pasteDataSet[0]") {{ header }}
+					tr(v-for="row in pasteDataSet.slice(1)")
+						td(v-for="cell in row") {{ cell }}
+
+			md-dialog-actions(v-if="isPageLoading")
+				md-button(:disabled="true") SENDING...
+			md-dialog-actions(v-else-if="pasteDataSet.length >= 2")
+				md-button(@click="showPasteDialog = false") CLOSE
+				md-button(class="md-accent", @click="sendPasteAction(true)") REPLACE ALL
+				md-button(class="md-primary", @click="sendPasteAction()") INSERT +
+			md-dialog-actions(v-else)
+				md-button(@click="showPasteDialog = false") CLOSE
 </template>
 
 <script>
@@ -60,6 +93,7 @@ import _sortBy from 'lodash/sortBy';
 
 import { mapGetters } from 'vuex';
 import tableResize from '@/lib/table-resize';
+import sheetclip from '@/lib/sheetclip';
 import { fetchTweetCounts } from '@/lib/tweet';
 
 import { isLink, parseNumber } from '@/utils/str';
@@ -71,11 +105,14 @@ export default {
 	mixins: [],
 	data: () => ({
 		displayError: null,
+		showPasteDialog: false,
+		pasteDataSet: [],
+		pasteDataSetNative: false,
 		sheet: null,
 		displayList: [],
 		dataSet: [],
 		searchTerm: '',
-		currentSort: 'ID',
+		currentSort: '0',
 		currentSortOrder: 'asc',
 		columnStyle: {
 			'id': 'min-width: 100px',
@@ -127,11 +164,10 @@ export default {
 			const maxTextLen = {};
 			const result = rows
 				// .filter(set => set.length - header.length >= 0)
-				.map(row => {
-					const obj = {};
-
-					header.forEach((key, index) => {
-						const rawValue = _get(row, ['cells', index, 'v']);
+				.map((row) => {
+					const allValues = [];
+					const cells = header.map((header, cellIndex) => {
+						const rawValue = _get(row, ['cells', cellIndex, 'v']);
 						const numValue = parseNumber(rawValue);
 
 						let value = rawValue;
@@ -144,18 +180,24 @@ export default {
 							value = `<a href="${value}" target="_blank">link</a>`;
 						}
 
-						obj[key] = value;
-
-						maxTextLen[key] = Math.max(
+						maxTextLen[cellIndex] = Math.max(
 							textLen,
-							maxTextLen[key] || 0
+							maxTextLen[cellIndex] || 0
 						);
+
+						allValues.push(String(value).toLowerCase());
+
+						return value;
 					});
 
-					return obj;
+					return { cells, fullText: allValues.join(' ') };
 				});
 
-			return { maxTextLen, list: result };
+			return { maxTextLen, header, rows: result };
+		},
+		exportUrl() {
+			const baseUrl = process.env.VUE_APP_API_ENDPOINT;
+			return `${baseUrl}/v1/sheets/${this.sheetId}/export/csv`;
 		}
 	},
 	watch: {
@@ -172,54 +214,54 @@ export default {
 		}
 	},
 	methods: {
+		async sendPasteAction(withReplace = false) {
+			const apiUrl = `v1/sheets/${this.sheetId}/rows/plain`;
+			const rows = this.pasteDataSet;
+
+			this.$store.dispatch('pageLoader', true);
+
+			try {
+				if (withReplace) {
+					await this.$http.put(apiUrl, rows);
+				} else {
+					await this.$http.patch(apiUrl, rows);
+				}
+
+				this.showPasteDialog = false;
+				this.pasteDataSet = [];
+
+				this.fetchData();
+			} catch (err) {
+				this.$swal.showError('Failed', err);
+			}
+
+			this.$store.dispatch('pageLoader', false);
+		},
 		async pasteAction() {
+			this.pasteDataSetNative = false;
+			this.showPasteDialog = true;
+			this.pasteDataSet = [];
+
 			try {
 				const text = await navigator.clipboard.readText();
-
-				if (!text || !text.length) {
-					return;
-				}
-
-				const rows = text.replace(/"((?:[^"]*(?:\r\n|\n\r|\n|\r))+[^"]+)"/mg, function (match, p1) {
-					// This function runs for each cell with multi lined text.
-					return p1
-						// Replace any double double-quotes with a single
-						// double-quote
-						.replace(/""/g, '"')
-						// Replace all new lines with spaces.
-						.replace(/\r\n|\n\r|\n|\r/g, ' ')
-					;
-				})
-				// Split each line into rows
-				.split(/\r\n|\n\r|\n|\r/g);
-
-				const maxCells = Math.max(...rows.map(v => v.length));
-
-				if (!rows || !maxCells) {
-					return;
-				}
-
-				this.$swal.dialog({
-					title: `Adding ${rows.length} rows with ${maxCells} columns into table?`,
-					preConfirm: () => {
-						const apiUrl = `v1/sheets/${this.sheetId}/rows/plain`;
-
-						return this.$http.patch(apiUrl, { text: rows.join('\n') });
-					}
-				}).then(() => {
-					this.fetchData();
-					this.$swal.success('Success', `Successfully added`);
-				}).catch(err => {
-					if (err === 'cancel') return;
-					this.$swal.showError('Failed', err);
-					this.$store.dispatch('pageLoader', false);
-				});
+				this.onPasteDataSetNativeInput(text);
 			} catch (err) {
-				this.$swal.warn('Sorry, we cannot access to clipboard data, maybe you are using old browser.');
+				this.pasteDataSetNative = true;
 			}
 		},
+		onPasteDataSetNativeInput(value) {
+			try {
+				const rows = sheetclip.parse(value);
+				this.pasteDataSet = rows;
+				this.pasteDataSetNative = false;
+			} catch (err) {
+				console.warn('failed to parse pasted text.');
+			}
+
+			return value;
+		},
 		customSort(value) {
-			const list = _sortBy(value, this.currentSort);
+			const list = _sortBy(value, v => _get(v, `cells.${this.currentSort}`));
 
 			if (this.currentSortOrder === 'desc') {
 				return list.reverse();
@@ -274,12 +316,10 @@ export default {
 			this.columnStyle = result;
 		},
 		computeDisplayList() {
-			this.displayList = this.parsedDataSet.list.filter(v => {
-				const searchbleText = Object.keys(v)
-				.map(key => String(v[key]).toLowerCase())
-				.join(' ');
+			const searchTerm = this.searchTerm.toLowerCase();
 
-				return searchbleText.indexOf(this.searchTerm) > -1;
+			this.displayList = this.parsedDataSet.rows.filter(row => {
+				return row.fullText.indexOf(searchTerm) > -1;
 			});
 		}
 	}
