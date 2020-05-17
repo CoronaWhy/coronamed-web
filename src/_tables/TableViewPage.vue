@@ -94,7 +94,7 @@ import _sortBy from 'lodash/sortBy';
 import { mapGetters } from 'vuex';
 import tableResize from '@/lib/table-resize';
 import sheetclip from '@/lib/sheetclip';
-import { fetchTweetCounts } from '@/lib/tweet';
+import { fetchTweetCounts, initialPatch } from '@/lib/tweet';
 
 import { isLink, parseNumber } from '@/utils/str';
 
@@ -289,11 +289,12 @@ export default {
 			return this.$http.get(apiUrl)
 				.then(result => {
 					this.$store.dispatch('pageLoader', false);
-					this.sheet = result;
+					this.sheet = initialPatch(result);
 
 					setTimeout(() => this.initResize(), 400);
 				})
-				.then(() => fetchTweetCounts(this.parsedDataSet))
+				.then(() => fetchTweetCounts(this.sheet))
+				.then(result => { this.sheet = result })
 				.catch(err => {
 					console.warn('failed to fetch sheet:', err);
 
