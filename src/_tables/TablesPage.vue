@@ -76,15 +76,20 @@ export default {
 	watch: {
 		'currentSort': 'updateSortFilter',
 		'currentSortOrder': 'updateSortFilter',
-		'showList': 'refresh'
+		'showList'() {
+			this.$nextTick(() => this.refresh());
+		}
 	},
 	mounted() {
 		this.$root.$emit('sidebar:hide', 'left');
 		this.$root.$emit('sidebar:hide', 'right');
-		this.refresh();
+
+		this.$nextTick(() => this.refresh());
 	},
 	methods: {
 		refresh() {
+			if (!this.showList) return;
+
 			console.log('refresh sheets list');
 
 			const apiUrl = 'v1/sheets';

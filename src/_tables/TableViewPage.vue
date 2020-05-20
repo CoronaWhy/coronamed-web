@@ -12,7 +12,7 @@
 
 		md-table(
 			v-if="!isPageLoading",
-			v-model="displayList",
+			v-model="displayRows",
 			:md-sort.sync="currentSort",
 			:md-sort-order.sync="currentSortOrder",
 			:md-sort-fn="customSort"
@@ -26,18 +26,21 @@
 						a.btn(:href="exportUrl", target="_blank") EXPORT (CSV)
 
 				md-field.md-toolbar-section-end(md-clearable)
-					md-input(placeholder="Search" v-model="searchTerm", @input="computeDisplayList")
+					md-input(placeholder="Search" v-model="searchTerm", @input="computeDisplayRowsDebounce")
 
 			// Card content
 			md-table-row(slot="md-table-row", slot-scope="{ item, index }")
 				md-table-cell(
-					v-for="(value, cellIndex) in item.cells",
-					:style="columnStyle[cellIndex]",
+					v-for="(cellData, cellIndex) in item.cells",
 					:key="index + ':' + cellIndex",
-					:md-label="parsedDataSet.header[cellIndex]",
+					:md-label="sheetDataSet.header[cellIndex]",
 					:md-sort-by="String(cellIndex)",
 				)
-					span(v-html="value")
+					TableCell(
+						:cellValue="cellData.v",
+						:cellType="cellData.t",
+						:cellData="cellData"
+					)
 
 			// Card footer
 			template(v-slot:md-table-pagination)
@@ -52,7 +55,7 @@
 			// Card footer
 			template(v-slot:md-table-pagination)
 				md-card-content
-					.line Records: {{ displayList.length }}
+					.line Records: {{ displayRows.length }}
 
 		// Display paste dialog
 		md-dialog(
@@ -90,34 +93,32 @@
 <script>
 import _get from 'lodash/get';
 import _sortBy from 'lodash/sortBy';
+import _debounce from 'lodash/debounce';
 
 import { mapGetters } from 'vuex';
 import tableResize from '@/lib/table-resize';
 import sheetclip from '@/lib/sheetclip';
 import { fetchTweetCounts } from '@/lib/tweet';
 
-import { isLink, parseNumber } from '@/utils/str';
+import TableCell from './TableCell.vue';
 
 export default {
 	name: 'TableViewPage',
 	components: {
+		TableCell
 	},
 	mixins: [],
 	data: () => ({
 		displayError: null,
+		displayRows: [],
 		showPasteDialog: false,
 		pasteDataSet: [],
 		pasteDataSetNative: false,
 		sheet: null,
-		displayList: [],
-		dataSet: [],
+		sheetDataSet: null,
 		searchTerm: '',
 		currentSort: '0',
-		currentSortOrder: 'asc',
-		columnStyle: {
-			'id': 'min-width: 100px',
-			'date': 'min-width: 110px'
-		}
+		currentSortOrder: 'asc'
 	}),
 	computed: {
 		...mapGetters(['isPageLoading']),
@@ -147,54 +148,6 @@ export default {
 		sheetId() {
 			return this.$route.params.id;
 		},
-		parsedDataSet() {
-			let cellCur = 0;
-
-			const rows = _get(this.sheet, 'rows', []);
-			const header = _get(this.sheet, 'header', []).map((headerName, index) => {
-				if (!headerName && index === 0) {
-					return 'ID';
-				} else if (!headerName) {
-					return `Cell ${cellCur++}`;
-				}
-
-				return headerName;
-			});
-
-			const maxTextLen = {};
-			const result = rows
-				// .filter(set => set.length - header.length >= 0)
-				.map((row) => {
-					const allValues = [];
-					const cells = header.map((header, cellIndex) => {
-						const rawValue = _get(row, ['cells', cellIndex, 'v']);
-						const numValue = parseNumber(rawValue);
-
-						let value = rawValue;
-						let textLen = String(rawValue).length;
-
-						if (numValue !== null && String(rawValue).indexOf('-') < 0) {
-							value = numValue;
-						} else if (isLink(rawValue)) {
-							textLen = 4;
-							value = `<a href="${value}" target="_blank">link</a>`;
-						}
-
-						maxTextLen[cellIndex] = Math.max(
-							textLen,
-							maxTextLen[cellIndex] || 0
-						);
-
-						allValues.push(String(value).toLowerCase());
-
-						return value;
-					});
-
-					return { cells, fullText: allValues.join(' ') };
-				});
-
-			return { maxTextLen, header, rows: result };
-		},
 		exportUrl() {
 			const baseUrl = process.env.VUE_APP_API_ENDPOINT;
 			return `${baseUrl}/v1/sheets/${this.sheetId}/export/csv`;
@@ -205,15 +158,30 @@ export default {
 			handler: 'fetchData',
 			immediate: true
 		},
-		'parsedDataSet': {
-			handler() {
-				this.computeColumnStyles();
-				this.computeDisplayList();
-			},
-			immediate: true
-		}
+		'sheetDataSet': 'computeDisplayRows'
+	},
+	created() {
+		this.computeDisplayRowsDebounce = _debounce(this.computeDisplayRows, 400);
 	},
 	methods: {
+		computeDisplayRows() {
+			console.warn('computing display rows');
+
+			if (!this.sheetDataSet) {
+				this.displayRows = [];
+				return;
+			}
+
+			const searchTerm = this.searchTerm.toLowerCase();
+
+			if (!searchTerm) {
+				this.displayRows = this.sheetDataSet.rows;
+				return;
+			}
+
+			this.displayRows = this.sheetDataSet.rows
+				.filter(row => row.fullText.indexOf(searchTerm) > -1);
+		},
 		async sendPasteAction(withReplace = false) {
 			const apiUrl = `v1/sheets/${this.sheetId}/rows/plain`;
 			const rows = this.pasteDataSet;
@@ -233,9 +201,8 @@ export default {
 				this.fetchData();
 			} catch (err) {
 				this.$swal.showError('Failed', err);
+				this.$store.dispatch('pageLoader', false);
 			}
-
-			this.$store.dispatch('pageLoader', false);
 		},
 		async pasteAction() {
 			this.pasteDataSetNative = false;
@@ -261,7 +228,7 @@ export default {
 			return value;
 		},
 		customSort(value) {
-			const list = _sortBy(value, v => _get(v, `cells.${this.currentSort}`));
+			const list = _sortBy(value, v => _get(v, `cells.${this.currentSort}.v`));
 
 			if (this.currentSortOrder === 'desc') {
 				return list.reverse();
@@ -273,55 +240,70 @@ export default {
 			const thead = this.$el.querySelector('thead');
 			tableResize(thead);
 
-			// flush column styles to give ability change size
+			// flush current cell min width
 			this.$nextTick(() => {
-				this.columnStyle = {};
+				const list = this.$el.querySelectorAll('.md-table-cell');
+
+				list.forEach(cell => {
+					cell.style.minWidth = null;
+				});
 			});
 		},
-		fetchData() {
-			const apiUrl = `v1/sheets/${this.sheetId}`;
+		async fetchData() {
+			this.sheet        = null;
+			this.sheetDataSet = null;
+			this.displayError = null;
+			this.displayRows = [];
 
 			this.$store.dispatch('pageLoader', true);
-			this.sheet = null;
-			this.dataSet = [];
-			this.displayError = null;
 
-			return this.$http.get(apiUrl)
-				.then(result => {
-					this.$store.dispatch('pageLoader', false);
-					this.sheet = result;
+			try {
+				const sheet = await this.$http.get(`v1/sheets/${this.sheetId}`);
+				sheet.rows = await this.$http.get(`v1/sheets/${this.sheetId}/rows`);
 
-					setTimeout(() => this.initResize(), 400);
-				})
-				.then(() => fetchTweetCounts(this.parsedDataSet))
-				.catch(err => {
-					console.warn('failed to fetch sheet:', err);
+				this.sheet = sheet;
+				this.sheetDataSet = this.parseSheetData(sheet);
 
-					this.$store.dispatch('pageLoader', false);
-					this.displayError = err.message;
+				setTimeout(() => this.initResize(), 400);
+			} catch (err) {
+				console.warn('failed to fetch sheet:', err);
+				this.displayError = err.message;
+			}
+
+			this.$store.dispatch('pageLoader', false);
+		},
+		parseSheetData(sheet) {
+			let cellCur = 0;
+
+			const sheetRows = _get(sheet, 'rows', []);
+			const sheetHeader = _get(sheet, 'header', []).map((headerName, index) => {
+				if (!headerName && index === 0) {
+					return 'ID';
+				} else if (!headerName) {
+					return `Cell ${cellCur++}`;
+				}
+
+				return headerName;
+			});
+
+			const rows = sheetRows.map(row => {
+				const allValues = [];
+				const cells = sheetHeader.map((header, cellIndex) => {
+					const cellData = _get(row, ['cells', cellIndex], {
+						v: '',
+						t: 'string'
+					});
+
+					allValues.push(String(cellData.v).toLowerCase());
+
+					return cellData;
 				});
-		},
-		computeColumnStyles() {
-			const result = {};
 
-			Object.keys(this.parsedDataSet.maxTextLen).forEach(key => {
-				const maxTextSize = this.parsedDataSet.maxTextLen[key];
-				let minWidth = 100 + Math.min(maxTextSize * 4, 540);
-
-				result[key.toLowerCase()] = {
-					'min-width': Math.floor(minWidth) + 'px'
-				};
+				return { cells, fullText: allValues.join(' ') };
 			});
 
-			this.columnStyle = result;
+			return { header: sheetHeader, rows };
 		},
-		computeDisplayList() {
-			const searchTerm = this.searchTerm.toLowerCase();
-
-			this.displayList = this.parsedDataSet.rows.filter(row => {
-				return row.fullText.indexOf(searchTerm) > -1;
-			});
-		}
 	}
 };
 </script>
