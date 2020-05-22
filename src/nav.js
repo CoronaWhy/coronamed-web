@@ -4,4 +4,12 @@ export default [{
 }, {
 	title: 'Interactive Tables',
 	to: { name: 'tables.interactive' }
+}, {
+	title: 'Users',
+	to: { name: 'users' },
+	roles: ['ROLE_ADMIN']
+}, {
+	title: 'Login',
+	to: { name: 'login' },
+	roles: ['ROLE_ANON']
 }];

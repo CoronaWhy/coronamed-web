@@ -7,6 +7,8 @@ import * as getters from './getters';
 import * as mutations from './mutations';
 import defaultState from './state';
 
+import userModule from './_user';
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -19,5 +21,6 @@ export default new Vuex.Store({
 		createPersistedState({ key: process.env.VUE_APP_PERSISTED_STATE_KEY })
 	],
 	modules: {
+		user: userModule
 	}
 });

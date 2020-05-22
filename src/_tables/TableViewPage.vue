@@ -98,7 +98,7 @@ import _debounce from 'lodash/debounce';
 import { mapGetters } from 'vuex';
 import tableResize from '@/lib/table-resize';
 import sheetclip from '@/lib/sheetclip';
-import { fetchTweetCounts } from '@/lib/tweet';
+// import { fetchTweetCounts } from '@/lib/tweet';
 
 import TableCell from './TableCell.vue';
 
@@ -121,7 +121,11 @@ export default {
 		currentSortOrder: 'asc'
 	}),
 	computed: {
-		...mapGetters(['isPageLoading']),
+		...mapGetters({
+			isPageLoading: 'isPageLoading',
+			isAuth: 'user/isAuth',
+			accountRoles: 'user/roles'
+		}),
 		pageTitle() {
 			return this.displayTitle;
 		},
@@ -151,7 +155,16 @@ export default {
 		exportUrl() {
 			const baseUrl = process.env.VUE_APP_API_ENDPOINT;
 			return `${baseUrl}/v1/sheets/${this.sheetId}/export/csv`;
-		}
+		},
+		accessScope() {
+			return {
+				'read': true,
+				'write': (
+					this.accountRoles.indexOf('ROLE_ADMIN') > -1 ||
+					this.accountRoles.indexOf('ROLE_SHEET_EDIT') > -1
+				)
+			};
+		},
 	},
 	watch: {
 		'sheetId': {
@@ -205,6 +218,12 @@ export default {
 			}
 		},
 		async pasteAction() {
+			if (!this.isAuth) {
+				return this.$swal.warn(null, 'You need to signin to modify this table.');
+			} else if (!this.accessScope.write) {
+				return this.$swal.warn(null, 'Sorry you have no permission to edit this table.');
+			}
+
 			this.pasteDataSetNative = false;
 			this.showPasteDialog = true;
 			this.pasteDataSet = [];

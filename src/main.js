@@ -11,6 +11,7 @@ import '@/lib/data';
 import PaginationMore from '@/components/PaginationMore';
 import LocalPagination from '@/components/LocalPagination';
 import SlideLoader from '@/components/SlideLoader';
+import Ladda from '@/components/Ladda';
 
 import pageTitleMixin from '@/mixins/pageTitle';
 
@@ -31,6 +32,7 @@ Vue.mixin(pageTitleMixin);
 Vue.component('LocalPagination', LocalPagination);
 Vue.component('PaginationMore', PaginationMore);
 Vue.component('SlideLoader', SlideLoader);
+Vue.component('Ladda', Ladda);
 
 new Vue({
 	router,

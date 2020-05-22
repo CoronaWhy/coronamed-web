@@ -20,3 +20,16 @@ export function touch({ commit, state }, [path, defVaule]) {
 		commit('SET', [path, defVaule]);
 	}
 }
+
+export function scheduledMessagesRefresh({ commit }) {
+	commit('SCHEDULED_MESSAGES_REFRESH');
+}
+
+export function flushStorage({ commit }) {
+	const flushMutations = Object.keys(this._mutations)
+		.filter(name => name.split('/').pop() === 'FLUSH_STATE');
+
+	flushMutations.forEach(name => {
+		commit(name, null, { root: true });
+	});
+}

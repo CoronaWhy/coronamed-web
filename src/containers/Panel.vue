@@ -45,6 +45,9 @@ export default {
 	}),
 	computed: {
 		...mapGetters(['isPageLoading']),
+		...mapGetters({
+			isAuth: 'user/isAuth'
+		}),
 		panelClass() {
 			return {
 				'app-sidebar--left--show': this.isSidebarShow['left'],
@@ -103,8 +106,6 @@ export default {
 		}
 	},
 	beforeDestroy() {
-		this.destroyRefreshRecentQuestionCount();
-
 		this.$root.$off('sidebar:toggle', this.toggleSidebar);
 		this.$root.$off('sidebar:show', this.showSidebar);
 		this.$root.$off('sidebar:hide', this.hideSidebar);
@@ -116,6 +117,11 @@ export default {
 		this.$root.$on('sidebar:show', this.showSidebar);
 		this.$root.$on('sidebar:hide', this.hideSidebar);
 		this.$root.$on('page-title:set', this.updatePageTitle);
+
+		if (this.isAuth) {
+			// Refresh account
+			this.$store.dispatch('user/refresh');
+		}
 	}
 };
 </script>

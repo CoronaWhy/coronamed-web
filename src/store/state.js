@@ -1,3 +1,12 @@
 export default () => ({
-	pageLoader: false
+	pageLoader: false,
+	scheduledMessagesRefreshCount: 0,
+	isSidebarShow: {
+		left: true,
+		right: false
+	},
+	isSidebarShowCustomComponent: {
+		left: true,
+		right: true
+	}
 });
