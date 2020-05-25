@@ -9,7 +9,9 @@
 				// Card header
 				md-toolbar(md-elevation="0").md-card-toolbar.md-toolbar.md-table-toolbar.md-transparent.md-card-toolbar.md-theme-default.md-elevation-0
 					.md-toolbar-section-start
-						.md-title Key Scientific Questions about COVID-19 <small>({{ displayList.length }} questions)</small>
+						.md-title
+							.pt-2 Key Scientific Questions about COVID-19 <small>({{ displayList.length }} questions)</small>
+							a.btn.btn-link(:href="exportUrl", target="_blank") EXPORT ALL
 
 					md-field.md-toolbar-section-end(md-clearable)
 						md-input(placeholder="Search by title..." v-model="filter.q")
@@ -71,6 +73,10 @@ export default {
 		},
 		showList() {
 			return this.$route.name === 'tables';
+		},
+		exportUrl() {
+			const baseUrl = process.env.VUE_APP_API_ENDPOINT;
+			return `${baseUrl}/v1/sheets/export`;
 		}
 	},
 	watch: {
