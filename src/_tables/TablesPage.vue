@@ -5,6 +5,17 @@
 
 		// Display table case
 		template(v-if="showList")
+			md-card.mb-4
+				md-card-content
+					h5 Literature Review
+					p
+						.line Using publications from the CORD-19 dataset <a href="https://www.kaggle.com/allen-institute-for-ai/CORD-19-research-challenge/discussion/137474" target="_blank">(Last updated: 2020-05-12)</a>
+						.line Covers <a href="https://www.kaggle.com/antgoldbloom/literature-review-coverage/" target="_blank">10.1%</a> of the studies published since February 1 (834 of the 8221 papers)
+
+					h5 About This Review
+					p These findings have been extracted from the CORD-19 papers by machine learning algorithms with a human curation overlay (process described in <a href="https://www.kaggle.com/allen-institute-for-ai/CORD-19-research-challenge/discussion/142298" target="_blank">this thread</a>). The results and quotes on this page should not be relied on without reading and assessing the validity of the underlying research. If you see a conclusion that is misrepresented, please use the <a href="https://www.kaggle.com/covid-19-contributions#feedback" target="_blank">feedback section</a> of this page to report it.
+					p This project is a part of the White House Office of Science and Technology Policy’s <a href="https://www.whitehouse.gov/briefings-statements/call-action-tech-community-new-machine-readable-covid-19-dataset/" target="_blank">call to action</a> for the technology community and addresses research priorities defined by the National Academies and the World Health Organization.
+					p This review can be useful for those wanting a quick overview of what the latest literature is saying on the topics we cover. It might also help those writing local guides, expert opinions or systematic reviews. Click on the topic in the table of contents below to see the results table for that topic.
 			md-card
 				// Card header
 				md-toolbar(md-elevation="0").md-card-toolbar.md-toolbar.md-table-toolbar.md-transparent.md-card-toolbar.md-theme-default.md-elevation-0
