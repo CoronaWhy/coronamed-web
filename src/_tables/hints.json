@@ -1,0 +1,226 @@
+[
+  {
+    "column": "Addressed Population",
+    "definition": "The population the studies findings is addressing. This can range from nursing staff to homeless to prisoners, which all have their own needs in the pandemic.",
+    "types": "Descriptive",
+    "examples": "Suburban Lahore",
+    "comments": ""
+  },
+  {
+    "column": "Challenge",
+    "definition": "The challenge the addressed population is facing.",
+    "types": "Descriptive",
+    "examples": "Overcrowding",
+    "comments": ""
+  },
+  {
+    "column": "Solution",
+    "definition": "The solution to the challenge the addressed population is facing in the pandemic.",
+    "types": "Descriptive",
+    "examples": "As proposed by the author",
+    "comments": ""
+  },
+  {
+    "column": "Excerpt",
+    "definition": "A section of the entire text used to highlight the important aspects for researchers/readers.",
+    "types": "Descriptive",
+    "examples": "-",
+    "comments": ""
+  },
+  {
+    "column": "Sample obtained",
+    "definition": "The sample that is obtained to test for a coronavirus infection. Most commonly Nasopharyngeal swabs are obtained, but also other swabs are evaluated.",
+    "types": "Categorical",
+    "examples": "Nasal, Throat, Conjunctival, Nasopharyngeal, Oropharyngeal, broncho-alveolar lavage, Sputum, Respiratory tract, Blood, Semen, Fecal Matter, GI tract (Gastrointestinal tract), Rectal, Anal",
+    "comments": ""
+  },
+  {
+    "column": "Severity of Disease",
+    "definition": "The severity of symptoms the cohort displays",
+    "types": "Categorical",
+    "examples": "Possible values: Mild, Moderate, Severe, Varied, ICU, non-ICU",
+    "comments": ""
+  },
+  {
+    "column": "Sample",
+    "definition": "Only used in tables regarding patients",
+    "types": "Categorical",
+    "examples": "If the study is a meta analysis/ review this study additionally includes the number of studies/articles used for the review.",
+    "comments": ""
+  },
+  {
+    "column": "Factors",
+    "definition": "Contributing factors to the subject of whatever the paper was testing/investigating.",
+    "types": "Categorical, Continuous",
+    "examples": "Temperature, Solar Radiation, Population Density, Precipitation",
+    "comments": ""
+  },
+  {
+    "column": "Influential",
+    "definition": "Weather a factor is influential to the question's answer.",
+    "types": "Binary",
+    "examples": "Y: the factor is influential to the questions answer.\nN: the factor is not influential to the questions answer.",
+    "comments": ""
+  },
+  {
+    "column": "Age",
+    "definition": "All parameters regarding the age of the given cohort (mean, median, iqr, range) reported in the study.",
+    "types": "Nominal",
+    "examples": "5 YO, 5, 05 = Five years Old",
+    "comments": ""
+  },
+  {
+    "column": "Assay",
+    "definition": "An assay is an analysis done to determine: The presence of a substance and the amount of that substance.",
+    "types": "Descriptive",
+    "examples": "-",
+    "comments": ""
+  },
+  {
+    "column": "Speed of assay",
+    "definition": "How long the assay is taking for the analysis",
+    "types": "Discrete, Continuous",
+    "examples": "realtime, x mins, x hours, x days in the way the study reports on this",
+    "comments": ""
+  },
+  {
+    "column": "FDA approval",
+    "definition": "Weather the tool has been FDA approved",
+    "types": "Binary",
+    "examples": "Y: FDA approved\nN: not FDA approved",
+    "comments": ""
+  },
+  {
+    "column": "Method",
+    "definition": "The method used in this study. In modeling studies the model that has been used (e.g.) and in genetic related questions the extraction method that has been used (e.g.)",
+    "types": "Descriptive",
+    "examples": "Modelling studies describe the model used; genetic studies describe extraction methods used to test the relevant changes in genetic make-up",
+    "comments": ""
+  },
+  {
+    "column": "Result",
+    "definition": "The findings of the study related to the question",
+    "types": "Descriptive",
+    "examples": "-",
+    "comments": ""
+  },
+  {
+    "column": "Material",
+    "definition": "The material that is described in the study, which properties are described",
+    "types": "Descriptive",
+    "examples": "Materials currently are decontamination agents, sheddings routes (equal to sample obtained), surfaces.",
+    "comments": ""
+  },
+  {
+    "column": "Measure of Evidence",
+    "definition": "Whatever gives the study validity",
+    "types": "Descriptive",
+    "examples": "For studies with patients (e.g. What do we know about viral shedding in stool?):\n- How many patients (patients: 217); How many studies in review/meta analysis studies (studies: 116); Severity of Symptoms (severity: severe)\n\nFor modelling studies (eg. seasonality of transmission):\n- Model used (model: SEIR); Countries modeled (countries: China); cities modeled (cities: Wuhan); provinces modeled (provinces: 90); Number of countries modeled (countries: 16); Population size modeled (people: 824000 / cases: 210 / patients: 8137)\n\nFor confirmation by Method (e.g. What is the evidence that domesticated/farm animals can be infected and maintain transmissibility of the disease? ):\n- What method has been used to confirm the findings (detection: PCR-confirmed)\n\nFor confirmation by survery (e.g. Methods to control the spread in communities, barriers to compliance and how these vary among different populations):\n- How many participants were included in the study (participants: 316)",
+    "comments": ""
+  },
+  {
+    "column": "Therapeutic method(s) utilized/assessed:",
+    "definition": "Medications to treat patients, but not limited to pharmaceuticals.",
+    "types": "Descriptive",
+    "examples": "azithromycin, hydroxycloroquine, breathing techniques, etc. Not limited to pharmaceutics.",
+    "comments": ""
+  },
+  {
+    "column": "General Outcome/Conclusion Excerpt",
+    "definition": "Whatever the author of the study decides the conclusion go the research has been.",
+    "types": "Descriptive",
+    "examples": "-",
+    "comments": ""
+  },
+  {
+    "column": "Clinical Improvement (Y/N)",
+    "definition": "A short version of the General Outcome/Conclusion Excerpt.",
+    "types": "Binary",
+    "examples": "Y: significant clinical improved by the utilized Therapeutic method\nN: no significant clinical improved by the utilized Therapeutic method",
+    "comments": ""
+  },
+  {
+    "column": "Measure of Testing Accuracy",
+    "definition": "Any measurement that reflects the accuracy of the test",
+    "types": "Categorical; Continuous",
+    "examples": "sensitivity: 98%; specificity: 85%; ..",
+    "comments": ""
+  },
+  {
+    "column": "Asymptomatic",
+    "definition": "Percentage of patients that do not show symptoms",
+    "types": "Continuous",
+    "examples": "25% of population X did not show symptoms",
+    "comments": ""
+  },
+  {
+    "column": "Asymptomatic Transmission",
+    "definition": "The percentage of people that were infected during the asymptomatic stage of the person infecting them.",
+    "types": "Continuous",
+    "examples": "-",
+    "comments": ""
+  },
+  {
+    "column": "Days",
+    "definition": "The median and mean incubation periods. Incubation period refers to the time from infection to first symptoms.",
+    "types": "Continuous",
+    "examples": "-",
+    "comments": ""
+  },
+  {
+    "column": "Range (Days)",
+    "definition": "any measurement related to the range of the incubation period (range, percentile. IQR). Incubation period refers to the time from infection to first symptoms.",
+    "types": "Continuous",
+    "examples": "-",
+    "comments": ""
+  },
+  {
+    "column": "Days After Admission",
+    "definition": "mean, median and range of days the virus is still detectable in the sample after admission",
+    "types": "Ordinal",
+    "examples": "10 days after admission",
+    "comments": ""
+  },
+  {
+    "column": "Days After Onset",
+    "definition": "mean, median and range of days the virus is still detectable in the sample after onset",
+    "types": "Ordinal",
+    "examples": "15 days after onset, includes the time before admission",
+    "comments": ""
+  },
+  {
+    "column": "TCID50",
+    "definition": "Tissue Culture Infection Dose 50 is the concentration at which 50% of the cells are infected in a cell culture.",
+    "types": "Nominal",
+    "examples": "",
+    "comments": ""
+  },
+  {
+    "column": "Persistence",
+    "definition": "The maximum time the virus can be detectable in the material",
+    "types": "Ratio",
+    "examples": "x minutes, x hours, x days, etc.",
+    "comments": ""
+  },
+  {
+    "column": "Half-life",
+    "definition": "Time until the detectable quantitiy of the virus is reduced to half of its original quantity",
+    "types": "Ratio",
+    "examples": "10 -> 5 -> 2.5 -> 1.25 -> ... The time take to half the sample remains constant.",
+    "comments": ""
+  },
+  {
+    "column": "Cases",
+    "definition": "Infected people",
+    "types": "Categorical; Continuous",
+    "examples": "2 infections; could be 2.2 if averaged",
+    "comments": ""
+  },
+  {
+    "column": "Patients",
+    "definition": "Cases receiving care in the hospital",
+    "types": "Categorical; Continuous",
+    "examples": "2 cases; could be 2.2 if averaged",
+    "comments": ""
+  }
+]

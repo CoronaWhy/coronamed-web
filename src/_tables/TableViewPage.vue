@@ -34,6 +34,7 @@
 					v-for="(cellData, cellIndex) in item.cells",
 					:key="index + ':' + cellIndex",
 					:md-label="sheetDataSet.header[cellIndex]",
+					:md-tooltip="getHint(sheetDataSet.header[cellIndex])",
 					:md-sort-by="String(cellIndex)",
 				)
 					TableCell(
@@ -99,6 +100,7 @@ import { mapGetters } from 'vuex';
 import tableResize from '@/lib/table-resize';
 import sheetclip from '@/lib/sheetclip';
 // import { fetchTweetCounts } from '@/lib/tweet';
+import hints from './hints.json';
 
 import TableCell from './TableCell.vue';
 
@@ -323,6 +325,16 @@ export default {
 
 			return { header: sheetHeader, rows };
 		},
+		capitalize(string) {
+			return string[0].toUpperCase() + string.slice(1);
+		},
+		getHint(columnName) {
+			const col = hints.find(({ column }) => column === columnName);
+			if (!col) {
+				return null;
+			}
+			return col.definition;
+		}
 	}
 };
 </script>
