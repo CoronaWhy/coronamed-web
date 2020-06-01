@@ -325,9 +325,6 @@ export default {
 
 			return { header: sheetHeader, rows };
 		},
-		capitalize(string) {
-			return string[0].toUpperCase() + string.slice(1);
-		},
 		getHint(columnName) {
 			const col = hints.find(({ column }) => column === columnName);
 			if (!col) {
