@@ -8,7 +8,15 @@ export const routes = [{
 	children: [{
 		path: ':id',
 		name: 'tables.view',
-		component: () => import(/* webpackChunkName: "table-view" */ './TableViewPage.vue')
+		component: () => import(/* webpackChunkName: "table-view" */ './TableViewPage.vue'),
+		meta: {
+			showPublicUrl: true
+		}
+	}, {
+		path: ':id/public',
+		name: 'tables.view.public',
+		component: () => import(/* webpackChunkName: "table-view" */ './TableViewPage.vue'),
+		meta: { tableTransform: 'public' },
 	}]
 }, {
 	path: '/interactive-tables',

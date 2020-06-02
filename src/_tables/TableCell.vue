@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import _get from 'lodash/get';
 import moment from 'moment';
 
 export default {
@@ -37,10 +38,10 @@ export default {
 					return moment(this.cellValue).format('YYYY-MM-DD');
 
 				case 'cord_ref':
-					return 'link';
+					return _get(this.cellData, 'title') || 'link';
 
 				case 'url':
-					return 'link';
+					return _get(this.cellData, 'title') || 'link';
 
 				default:
 					return this.cellValue;

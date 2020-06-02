@@ -23,6 +23,7 @@
 				.md-toolbar-section-start
 					.line.mt-2
 						router-link.btn(:to="{ name: 'tables' }") SHOW LIST
+						router-link.btn(:to="{ name: 'tables.view.public', params: { id: sheetId } }", v-if="isShowPublicUrl") PUBLIC VERSION
 						a.btn(:href="exportUrl", target="_blank") EXPORT (CSV)
 
 				md-field.md-toolbar-section-end(md-clearable)
@@ -154,9 +155,33 @@ export default {
 		sheetId() {
 			return this.$route.params.id;
 		},
+		isShowPublicUrl() {
+			return _get(this.$route, 'meta.showPublicUrl', false);
+		},
+		sheetFetchParams() {
+			const result = {};
+			const tableTransform = _get(this.$route, 'meta.tableTransform');
+
+			if (tableTransform) {
+				result.transform = tableTransform;
+			}
+
+			return result;
+		},
 		exportUrl() {
 			const baseUrl = process.env.VUE_APP_API_ENDPOINT;
-			return `${baseUrl}/v1/sheets/${this.sheetId}/export/csv`;
+
+			let finalUrl = `${baseUrl}/v1/sheets/${this.sheetId}/export/csv`;
+
+			const queryParams = Object.keys(this.sheetFetchParams)
+				.map(key => `${key}=${this.sheetFetchParams[key]}`)
+				.join('&');
+
+			if (queryParams) {
+				finalUrl += `?${queryParams}`;
+			}
+
+			return finalUrl;
 		},
 		accessScope() {
 			return {
@@ -173,6 +198,7 @@ export default {
 			handler: 'fetchData',
 			immediate: true
 		},
+		'sheetFetchParams': 'fetchData',
 		'sheetDataSet': 'computeDisplayRows'
 	},
 	created() {
@@ -280,7 +306,17 @@ export default {
 
 			try {
 				const sheet = await this.$http.get(`v1/sheets/${this.sheetId}`);
-				sheet.rows = await this.$http.get(`v1/sheets/${this.sheetId}/rows`);
+
+				const rows = await this.$http.get(`v1/sheets/${this.sheetId}/rows`, {
+					params: this.sheetFetchParams
+				});
+
+				sheet.rows = rows;
+
+				// redefine header by transformed rows result
+				if (rows._payload && rows._payload.header) {
+					sheet.header = rows._payload.header;
+				}
 
 				this.sheet = sheet;
 				this.sheetDataSet = this.parseSheetData(sheet);
