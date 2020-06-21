@@ -1,5 +1,5 @@
 <template lang="pug">
-	.table-cell
+	.table-cell(:class="cellClass")
 		// Cord ref case
 		template(v-if="cellType === 'cord_ref'")
 			a(:href="cellData.link", target="_blank", v-if="cellData.link") {{ displayValue }}
@@ -47,6 +47,16 @@ export default {
 					return this.cellValue;
 			}
 		},
+		cellClass() {
+			const bgColor = _get(this.cellData, 'bgColor');
+			const result = {};
+
+			if (bgColor) {
+				result[`bg-${bgColor}`] = true;
+			}
+
+			return result;
+		},
 		displayValueLength() {
 			return String(this.displayValue).length;
 		}
@@ -73,5 +83,14 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
+	.table-cell {
+		&.bg-red {
+			background-color: #F1BAB6;
+		}
+
+		&.bg-green {
+			background-color: #A9DDC2;
+		}
+	}
 </style>

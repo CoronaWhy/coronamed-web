@@ -29,6 +29,9 @@
 				md-field.md-toolbar-section-end(md-clearable)
 					md-input(placeholder="Search" v-model="searchTerm", @input="computeDisplayRowsDebounce")
 
+				.col-12(v-if="!isShowPublicUrl")
+					img(src="@/assets/public-sheets-helper.png", style="max-height: 120px")
+
 			// Card content
 			md-table-row(slot="md-table-row", slot-scope="{ item, index }")
 				md-table-cell(

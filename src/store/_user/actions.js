@@ -1,6 +1,4 @@
-import $router from '@/router';
 import $http from '@/lib/axios';
-import $swal from '@/lib/swal';
 
 export function loginByEmail({ commit }, { email, password, remember }) {
 	const credits = { email, password };
