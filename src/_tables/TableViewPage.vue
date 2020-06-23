@@ -30,7 +30,11 @@
 					md-input(placeholder="Search" v-model="searchTerm", @input="computeDisplayRowsDebounce")
 
 				.col-12(v-if="!isShowPublicUrl")
-					img(src="@/assets/public-sheets-helper.png", style="max-height: 120px")
+					.line † odds ratio calculated from a frequency table in the original paper
+					.line § not adjusted for possible confounders
+					.line ‡ critical only instead of critical and severe combined
+					.line ⸸ deaths were compared only to those discharged, and not to survivors still in hospital
+					.line <span style="color: #A9DDC2">Green</span> means significant (p &lt; 0.05 and/or confidence interval does not overlap with 1.0) and <span style="color: #F1BAB6">red</span> means not significant (p &gt; 0.05 and/or confidence interval overlaps with the value 1.0)
 
 			// Card content
 			md-table-row(slot="md-table-row", slot-scope="{ item, index }")
